@@ -3,21 +3,17 @@
  * Implements design with #050C23 as main background and #A020F0 as accent color.
  */
 
-/* Custom Properties for easy theme management */
+/* Custom Properties */
 :root {
-    --bg-primary: #050C23;       /* Rest of the page background */
-    --bg-secondary: #0F172A;     /* Slightly lighter for cards */
-    --bg-navbar: rgba(42, 47, 58, 0.95); /* Original upper bar color #2A2F3A */
-    
+    --bg-primary: #050C23;
+    --bg-secondary: #0F172A;
+    --bg-navbar: rgba(42, 47, 58, 0.95);
     --accent: #A020F0;
     --accent-light: #B44DF2;
-    
     --text-primary: #F8F8F8;
     --text-secondary: #B0B5C0;
-    
     --font-main: 'Inter', system-ui, -apple-system, sans-serif;
     --font-titles: 'Product Sans', sans-serif;
-    
     --transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
     --nav-height: 80px;
 }
@@ -33,6 +29,8 @@ html {
     scroll-behavior: smooth;
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 255, 255, 0.15) var(--bg-secondary);
+    overflow-x: hidden; /* Prevent horizontal scroll completely */
+    width: 100%;
 }
 
 /* Global Scrollbar to match Taskbar */
@@ -42,7 +40,7 @@ html {
 }
 
 ::-webkit-scrollbar-track {
-    background-color: var(--bg-secondary); /* Matches taskbar color */
+    background-color: var(--bg-secondary);
     border-left: 1px solid rgba(255, 255, 255, 0.05);
 }
 
@@ -63,6 +61,9 @@ body {
     color: var(--text-secondary);
     line-height: 1.6;
     overflow-x: hidden;
+    width: 100%;
+    position: relative;
+    padding-bottom: calc(40px + env(safe-area-inset-bottom, 0)); /* Room for taskbar + Safari safe area */
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -87,9 +88,10 @@ ul {
 
 /* Reusable Layout Utilities */
 .container {
+    width: 100%;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 2rem;
+    padding: 0 1.5rem;
 }
 
 section {
@@ -106,13 +108,13 @@ section {
     margin-bottom: 3rem;
     display: flex;
     align-items: center;
+    width: 100%;
 }
 
 .section-title::after {
     content: "";
-    display: block;
+    flex: 1; /* Automatically fill remaining width without causing horizontal overflow */
     height: 1px;
-    width: 200px;
     background-color: var(--bg-secondary);
     margin-left: 1.5rem;
 }
@@ -143,6 +145,7 @@ section {
 header {
     position: fixed;
     top: 0;
+    left: 0;
     width: 100%;
     height: var(--nav-height);
     background-color: var(--bg-navbar);
@@ -248,12 +251,12 @@ header.scrolled {
 }
 
 .name {
-    font-size: clamp(40px, 8vw, 80px);
+    font-size: clamp(28px, 8vw, 80px);
     margin-bottom: 0.5rem;
 }
 
 .subtitle {
-    font-size: clamp(30px, 6vw, 60px);
+    font-size: clamp(20px, 6vw, 60px);
     color: var(--text-secondary);
     margin-bottom: 1.5rem;
 }
@@ -277,7 +280,7 @@ header.scrolled {
 
 .skills-list {
     display: grid;
-    grid-template-columns: repeat(2, minmax(140px, 200px));
+    grid-template-columns: repeat(2, minmax(130px, 1fr));
     gap: 0.5rem 1rem;
     margin-top: 1.5rem;
 }
@@ -315,8 +318,8 @@ header.scrolled {
 .img-wrapper::after {
     content: '';
     position: absolute;
-    top: 20px;
-    left: 20px;
+    top: 15px;
+    left: 15px;
     width: 100%;
     height: 100%;
     border: 2px solid var(--accent);
@@ -476,7 +479,6 @@ footer p {
     font-size: 0.8rem;
 }
 
-/* Gemini Logo Footer */
 .made-with {
     display: flex;
     align-items: center;
@@ -497,7 +499,6 @@ footer p {
     50% { transform: scale(1.15); opacity: 1; }
 }
 
-/* Lazy Load Animations (Intersection Observer targets) */
 .fade-in-section {
     opacity: 0;
     transform: translateY(20px);
@@ -514,8 +515,35 @@ footer p {
 
 /* Responsive Media Queries */
 @media (max-width: 768px) {
+    .container {
+        padding: 0 1rem;
+    }
+    
+    .name {
+        font-size: clamp(28px, 9vw, 60px);
+    }
+
+    .subtitle {
+        font-size: clamp(18px, 6vw, 40px);
+    }
+
+    .greeting {
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .bio {
+        font-size: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .section-title {
+        font-size: 1.4rem;
+        margin-bottom: 2rem;
+    }
+
     .section-title::after {
-        width: 100%;
+        margin-left: 1rem;
     }
 
     /* Mobile Navigation */
@@ -527,10 +555,11 @@ footer p {
     .nav-menu {
         position: fixed;
         top: 0;
-        right: -100%; /* Hidden to the right */
-        width: 70%;
+        right: -100%;
+        width: 75%;
         height: 100vh;
         background-color: var(--bg-navbar);
+        backdrop-filter: blur(10px);
         display: flex;
         justify-content: center;
         align-items: center;
@@ -565,31 +594,53 @@ footer p {
     /* Stack grid elements */
     .about-content {
         grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .skills-list {
+        grid-template-columns: 1fr; /* Single column prevents overflow */
     }
     
     .img-wrapper {
-        margin-top: 3rem;
+        margin-top: 1rem;
+        /* Make room for the absolutely positioned pseudo-element so it doesn't cause overflow */
+        max-width: calc(100% - 15px);
+        margin-left: 0;
     }
     
     section {
-        padding: 80px 0;
+        padding: 70px 0;
     }
     
+    .projects-grid {
+        gap: 1.2rem;
+    }
+
     .project-card {
-        flex: 0 0 85vw; /* Almost full width on mobile */
+        flex: 0 0 85vw;
         scroll-snap-align: center;
     }
-    
+
+    /* Taskbar mobile constraints */
+    .start-button, .taskbar-icon {
+        width: 40px; 
+    }
+
+    .taskbar-datetime {
+        padding: 0 10px;
+        min-width: 60px;
+    }
+
+    #taskbar-time, #taskbar-date {
+        font-size: 10px;
+    }
 }
 
 /* Custom Taskbar */
-body {
-    padding-bottom: 40px; /* Room for taskbar */
-}
-
 .taskbar {
     position: fixed;
     bottom: 0;
+    bottom: env(safe-area-inset-bottom, 0); /* Fixes Safari overlapping bottom UI bug */
     left: 0;
     width: 100%;
     height: 40px;
